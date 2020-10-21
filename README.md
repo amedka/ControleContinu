@@ -13,5 +13,5 @@ https://classroom.github.com/a/JK6s_stq
 
 ## Documentations
 
-- [Documentation Choco](docs/choco-tuto.pdf)
+- [Documentation Choco](https://choco-solver.org/docs/)
 - [Documentation Git](docs/git-documentation.pdf)
