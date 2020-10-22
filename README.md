@@ -4,7 +4,7 @@
 * [Email](mailto:nadjib.lazaar@umontpellier.fr).
 
 
-## Controle Continu - CP Fortnite
+## Controle Continu - CP Models using Choco Solver
 
 - Le [StudentPack](https://education.github.com/pack) de GitHub vous permet d'avoir une licence gratuite pour plusieurs outils payants et la possibilité d'avoir des **projets privés** sur GitHub.
 - Le lien **GitHub Classroom** vous permet de créer un fork du projet et d'affecter automatiquement votre projet à l'organisation * HMIN330M-Constraints* :
