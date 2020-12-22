@@ -1,4 +1,6 @@
-inst1::
+All instances ::  TIMEOUT=15min
+=============================
+inst1:
 FORTNITERS(2,2,3,1,1)
 	Day 1
 		Session 1: 0, 1, 
