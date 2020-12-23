@@ -1,13 +1,22 @@
+package problems;
+
 
 import org.chocosolver.solver.Model;
-import org.kohsuke.args4j.Option;
+import org.chocosolver.solver.Solution;
+
+import problems.AbstractProblem;
+import org.chocosolver.solver.variables.IntVar;
+
+
 
 public class Fortnite extends AbstractProblem {
 
-	@Option(name = "-i", aliases = "--instance", usage = "Instance ID.", required = true)
-	Data data = Data.inst1;
+	//@Option(name = "-i", aliases = "--instance", usage = "Instance ID.", required = true)
+	Data data = Data.inst3;
 
-	int nb_sessions, nb_days, nb_players_per_session, min_sessions, max_sessions;
+	int nb_sessions, nb_days, nb_players_per_session, min_sessions, max_sessions , nb_players;
+	private IntVar[][] variables;
+	
 
 	@Override
 	public void buildModel() {
@@ -21,12 +30,59 @@ public class Fortnite extends AbstractProblem {
 		min_sessions = data.param(3);
 
 		max_sessions = data.param(4);
+		
+		nb_players = nb_players_per_session * nb_sessions;
 
 		model = new Model();
 		
+		variables = model.intVarMatrix("variables", nb_players, nb_days, 1, nb_sessions);
+		
+		// repartition des joueur en sessions, pas plus de nb_players_per_session dans chaque session
+		IntVar max =  model.intVar(nb_players_per_session);
+		for (int d= 0; d<nb_days; d++ ) {
+		IntVar[] temps = new IntVar[nb_players];
+			for (int p=0; p<nb_players; p++) {
+				temps[p]= variables[p][d];
+			}
+			for (int s=1; s<nb_sessions+1; s++) {
+				
+				model.count(s, temps, max).post();
+			}
+			
+		
+		}
+		
+		// si deux joueurs jouent ensemble un jours ils ne jouent pas ensemble le lendemain
+
+		
+		
+		
+		//deux joueurs jouent ensemble entre min et max sessions
+		IntVar minS =  model.intVar(min_sessions);
+		IntVar maxS =  model.intVar(max_sessions+1);
+		for(int p1=0; p1<nb_players-1; p1++) {
+			for  (int p2 =p1+1; p2<nb_players; p2++) {
+				IntVar[] temps = new IntVar[nb_days];
+				for (int d =0; d<nb_days; d++) {
+					temps[d]= variables[p1][d].sub(variables[p2][d]).abs().intVar();
+				}
+				for (int i=0; i<nb_days-1; i++) {
+					// si deux joueur jouent ensemble ils ne peuvent pas jouer ensemble a nouveaux le lendemain
+					model.arithm(temps[i], "+", temps[i+1], "!=", 0).post();
+				}
+				//max session
+				model.not(model.count(0, temps, maxS)).post();
+				//min session
+				if (min_sessions>0) {model.count(0, temps, minS).post();}
+				
+			}
+
+		}
+		
+	}
+	
 		//TODO
 
-	}
 
 	@Override
 	public void configureSearch() {
@@ -36,12 +92,16 @@ public class Fortnite extends AbstractProblem {
 	@Override
 	public void solve() {
 		
-		model.getSolver().solve();
+		Solution solution = model.getSolver().findSolution();
 
-		//print solution
+		if(solution != null){
+		    System.out.println(solution.toString());
+		}
 		
 
 		model.getSolver().printStatistics();
+		
+		
 	}
 
 	public static void main(String[] args) {
